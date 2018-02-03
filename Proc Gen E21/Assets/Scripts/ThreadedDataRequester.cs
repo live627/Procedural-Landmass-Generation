@@ -1,4 +1,3 @@
-﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -28,15 +27,14 @@ public class ThreadedDataRequester : MonoBehaviour {
 		}
 	}
 		
-
-	void Update() {
-		if (dataQueue.Count > 0) {
-			for (int i = 0; i < dataQueue.Count; i++) {
-				ThreadInfo threadInfo = dataQueue.Dequeue ();
-				threadInfo.callback (threadInfo.parameter);
-			}
-		}
-	}
+	void Update() {      
+        lock (dataQueue) {
+            while (dataQueue.Count > 0) {
+                ThreadInfo threadInfo = dataQueue.Dequeue();
+                threadInfo.callback(threadInfo.parameter);
+            }
+        }
+    }
 
 	struct ThreadInfo {
 		public readonly Action<object> callback;
